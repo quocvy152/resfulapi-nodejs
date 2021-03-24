@@ -26,6 +26,7 @@ router.route('/')
 
                 res.status(200).json({
                     message: "Get list product",
+                    quantity: listProduct.length,
                     listProduct: resListProd
                 });
 
@@ -175,7 +176,7 @@ router.route('/:productId')
             .catch(err => res.status(500).json({
                 error: err
             }));
-            
+
     })
 
 module.exports = router;

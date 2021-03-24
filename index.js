@@ -2,20 +2,22 @@ const express = require('express');
 const app = express();
 
 const bodyParser = require('body-parser');
-const morgan = require('morgan');
-const mongoose = require('mongoose');
+const morgan     = require('morgan');
+const mongoose   = require('mongoose');
 
 const URI_LOCAL_MONGODB = "mongodb://127.0.0.1:27017/resfulapi-nodejs";
 const PORT = process.env.PORT || 3000;
 
-const USER_ROUTE = require('./routes/product');
+const PRODUCT_ROUTE = require('./routes/product');
+const ORDER_ROUTE   = require('./routes/order');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({}));
 
 app.use(morgan('dev'));
 
-app.use('/products', USER_ROUTE);
+app.use('/products', PRODUCT_ROUTE);
+app.use('/orders', ORDER_ROUTE);
 
 app.use((req, res, next) => {
     const error = new Error('Not found');
