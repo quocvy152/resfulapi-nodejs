@@ -7,13 +7,11 @@ const PRODUCT_COLL = require('../models/product');
 
 router.route('/')
     .get((req, res) => {
-
         ORDER_COLL.find({})
             .populate("product")
             .exec()
             .then(listOrder => {
-
-                let resDetailOrder = listOrder.map(order => {
+                let detailOrder = listOrder.map(order => {
                     return {
                         _id: order._id,
                         quantity: order.quantity,
@@ -24,12 +22,11 @@ router.route('/')
                         }
                     }
                 });
-
                 res.status(200).json({
                     message: "Get list order",
-                    listOrder: resDetailOrder
+                    quantity: listOrder.length,
+                    listOrder: detailOrder
                 });
-
             })
             .catch(err => {
                 res.status(500).json({
@@ -39,33 +36,32 @@ router.route('/')
 
     })
     .post((req, res) => {
-        const { productID } = req.body;
+        const { productID, quantity } = req.body;
 
-        const order = new ORDER_COLL({
-            product: productID,
-            quantity: 1
-        });
-
-        order   
-            .save()
-            .then(order => {
-
+        PRODUCT_COLL.findById({ _id: productID })
+            .then(product => {
+                const order = new ORDER_COLL({
+                    product: product._id,
+                    quantity
+                });
+                return order.save();
+            })
+            .then(result => {
                 res.status(201).json({
-                    message: "Created order",
-                    order,
+                    message: "Order stored",
+                    createdOrder: result,
                     request: {
                         type: "GET",
-                        url: "http://localhost:3000/orders/" + order._id
+                        url: "http://localhost:3000/orders/" + result._id
                     }
                 });
-
             })
             .catch(err => {
                 res.status(500).json({
+                    message: "Product not found",
                     error: err
                 });
             })
-
     })
 
 router.route('/:orderID')
@@ -85,7 +81,10 @@ router.route('/:orderID')
                 });
             })
             .catch(err => {
-                error: err
+                res.status(500).json({
+                    message: "Order not found",
+                    error: err
+                });
             })
     })
     .patch((req, res) => {
@@ -138,9 +137,10 @@ router.route('/:orderID')
             })
             .catch(err => {
                 res.status(500).json({
+                    message: "Order not found",
                     error: err
                 });
             })
     })
-
+    
 module.exports = router;
