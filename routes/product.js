@@ -5,6 +5,7 @@ const PRODUCT_COLL = require('../models/product');
 
 // hàm kiểm tra và chỉ trả về những trường có giá trị của Object body tránh có field nhận giá trị null
 const checkInfoProduct = require('../utils/checkInfoProduct');
+const uploadMulter     = require('../utils/uploadMulter');
 
 router.route('/')
     .get((req, res) => {
@@ -17,6 +18,7 @@ router.route('/')
                         id: product._id,
                         name: product.name,
                         price: product.price,
+                        productImage: product.productImage,
                         request: {
                             type: "GET",
                             url: "http://localhost:3000/products/" + product._id
@@ -35,10 +37,10 @@ router.route('/')
                 error: err
             }));
     })
-    .post((req, res) => {
+    .post(uploadMulter.single('productImage'), (req, res) => {
         let { name, price } = req.body;
 
-        const product = new PRODUCT_COLL({ name, price: parseInt(price) });
+        const product = new PRODUCT_COLL({ name, price: parseInt(price), productImage: req.file.filename });
         product
             .save()
             .then(newProduct => {
@@ -47,6 +49,7 @@ router.route('/')
                     id: newProduct._id,
                     name: newProduct.name,
                     price: newProduct.price,
+                    productImage: newProduct.productImage,
                     request: {
                         type: "GET",
                         url: "http://localhost:3000/products/" + newProduct._id
@@ -69,25 +72,13 @@ router.route('/:productId')
         const { productId } = req.params;
 
         PRODUCT_COLL.findById({ _id: productId })
-            .select("_id name price")
+            .select("_id name price productImage")
             .exec()
             .then(product => {
 
-                if(!product) {
-                    return res.status(404).json({
-                        message: 'Product not found'
-                    });
-                }
-
-                let infoProduct = {
-                    id: product._id,
-                    name: product.name,
-                    price: product.price
-                }
-
                 res.status(200).json({
                     message: "Get product by Id",
-                    infoProduct,
+                    product,
                     request: {
                         type: "GET",
                         url: "http://localhost:3000/products"

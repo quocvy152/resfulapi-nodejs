@@ -112,6 +112,7 @@ router.route('/:orderID')
             })
             .catch(err => {
                 res.status(500).json({ 
+                    message: "Order not found",
                     error: err
                 });
             })

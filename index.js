@@ -11,6 +11,8 @@ const PORT = process.env.PORT || 3000;
 const PRODUCT_ROUTE = require('./routes/product');
 const ORDER_ROUTE   = require('./routes/order');
 
+app.use(express.static('public'));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({}));
 
