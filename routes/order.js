@@ -1,5 +1,4 @@
 const express = require('express');
-const { Router } = require('express');
 const router = express.Router();
 
 const ORDER_COLL   = require('../models/order');
@@ -71,18 +70,23 @@ router.route('/:orderID')
         ORDER_COLL.findById({ _id: orderID })
             .populate("product")
             .then(order => {
-                res.status(200).json({
-                    message: "Get order by id",
-                    order,
-                    request: {
-                        type: "GET",
-                        url: "http://localhost:3000/orders/" + order._id
-                    }
-                });
+                if(order) {
+                    res.status(200).json({
+                        message: "Get order by id",
+                        order,
+                        request: {
+                            type: "GET",
+                            url: "http://localhost:3000/orders/" + order._id
+                        }
+                    });
+                } else {
+                    res.status(404).json({
+                        message: "Order not found"
+                    });
+                }
             })
             .catch(err => {
                 res.status(500).json({
-                    message: "Order not found",
                     error: err
                 });
             })

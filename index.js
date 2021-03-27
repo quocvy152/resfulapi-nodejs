@@ -10,6 +10,7 @@ const PORT = process.env.PORT || 3000;
 
 const PRODUCT_ROUTE = require('./routes/product');
 const ORDER_ROUTE   = require('./routes/order');
+const USER_ROUTE    = require('./routes/user');
 
 app.use(express.static('public'));
 
@@ -20,6 +21,7 @@ app.use(morgan('dev'));
 
 app.use('/products', PRODUCT_ROUTE);
 app.use('/orders', ORDER_ROUTE);
+app.use('/users', USER_ROUTE);
 
 app.use((req, res, next) => {
     const error = new Error('Not found');
