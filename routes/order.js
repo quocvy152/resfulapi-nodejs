@@ -39,6 +39,12 @@ router.route('/')
 
         PRODUCT_COLL.findById({ _id: productID })
             .then(product => {
+                if(!product) {
+                    return res.status(404).json({
+                        message: "Product not found"
+                    });
+                } 
+
                 const order = new ORDER_COLL({
                     product: product._id,
                     quantity
@@ -57,7 +63,6 @@ router.route('/')
             })
             .catch(err => {
                 res.status(500).json({
-                    message: "Product not found",
                     error: err
                 });
             })
@@ -70,6 +75,7 @@ router.route('/:orderID')
         ORDER_COLL.findById({ _id: orderID })
             .populate("product")
             .then(order => {
+                console.log({ order })
                 if(order) {
                     res.status(200).json({
                         message: "Get order by id",

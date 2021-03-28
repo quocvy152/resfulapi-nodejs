@@ -75,16 +75,20 @@ router.route('/:productId')
             .select("_id name price productImage")
             .exec()
             .then(product => {
-
-                res.status(200).json({
-                    message: "Get product by Id",
-                    product,
-                    request: {
-                        type: "GET",
-                        url: "http://localhost:3000/products"
-                    }
-                });
-
+                if(!product) {
+                    res.status(404).json({
+                        message: "Product not found"
+                    });
+                } else {
+                    res.status(200).json({
+                        message: "Get product by Id",
+                        product,
+                        request: {
+                            type: "GET",
+                            url: "http://localhost:3000/products"
+                        }
+                    });
+                }
             })
             .catch(err => {
                 res.status(500).json({
@@ -92,11 +96,11 @@ router.route('/:productId')
                 });
             })
     })
-    .patch((req, res) => {
+    .patch(uploadMulter.single('productImage'), (req, res) => {
         const { productId } = req.params;
         const { name, price } = req.body;
 
-        const updateObj = checkInfoProduct(name, price);
+        const updateObj = checkInfoProduct(req, name, price);
 
         if(!updateObj) {
             res.status(500).json({
@@ -114,6 +118,7 @@ router.route('/:productId')
                         id: productAfterUpdate._id,
                         name: productAfterUpdate.name,
                         price: productAfterUpdate.price,
+                        productImage: productAfterUpdate.productImage,
                         request: {
                             type: "GET",
                             url: "http://localhost:3000/products/" + productAfterUpdate._id
@@ -121,7 +126,7 @@ router.route('/:productId')
                     }
 
                     res.status(200).json({
-                        message: "Update product",
+                        message: "Updated product",
                         infoProductAfterUpdate
                     })
                 })
