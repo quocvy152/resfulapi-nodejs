@@ -8,6 +8,8 @@ const mongoose   = require('mongoose');
 const URI_LOCAL_MONGODB = "mongodb://127.0.0.1:27017/resfulapi-nodejs";
 const PORT = process.env.PORT || 3000;
 
+const checkAuth = require('./utils/checkAuth');
+
 const PRODUCT_ROUTE = require('./routes/product');
 const ORDER_ROUTE   = require('./routes/order');
 const USER_ROUTE    = require('./routes/user');
@@ -18,6 +20,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json({}));
 
 app.use(morgan('dev'));
+app.use(checkAuth);
 
 app.use('/products', PRODUCT_ROUTE);
 app.use('/orders', ORDER_ROUTE);
